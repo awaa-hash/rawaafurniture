@@ -14,10 +14,10 @@
         <p>نسخة بسيطة قابلة للنشر على GitHub Pages</p>
       </div>
       <div class="topbar-actions">
-        <button id="tableViewBtn" class="active">الجدول</button>
-        <button id="calendarViewBtn">التقويم</button>
-        <button id="manageBtn">إدارة الأشخاص</button>
-        <button id="addTaskBtn">إضافة مهمة</button>
+        <button id="tableViewBtn" class="active" type="button">الجدول</button>
+        <button id="calendarViewBtn" type="button">التقويم</button>
+        <button id="manageBtn" type="button">إدارة الأشخاص</button>
+        <button id="addTaskBtn" type="button">إضافة مهمة</button>
       </div>
     </header>
 
@@ -65,9 +65,9 @@
       <div class="section-head">
         <h2>التقويم</h2>
         <div class="calendar-nav">
-          <button id="prevMonthBtn">السابق</button>
+          <button id="prevMonthBtn" type="button">السابق</button>
           <strong id="monthLabel"></strong>
-          <button id="nextMonthBtn">التالي</button>
+          <button id="nextMonthBtn" type="button">التالي</button>
         </div>
       </div>
       <div class="calendar-weekdays" id="calendarWeekdays"></div>
@@ -79,7 +79,7 @@
     <div class="modal-box">
       <div class="modal-head">
         <h3 id="taskModalTitle">إضافة مهمة</h3>
-        <button class="close-btn" data-close="taskModal">×</button>
+        <button class="close-btn" data-close="taskModal" type="button">×</button>
       </div>
 
       <div class="form-grid">
@@ -148,8 +148,8 @@
       </div>
 
       <div class="modal-actions">
-        <button class="secondary" data-close="taskModal">إلغاء</button>
-        <button id="saveTaskBtn">حفظ</button>
+        <button class="secondary" data-close="taskModal" type="button">إلغاء</button>
+        <button id="saveTaskBtn" type="button">حفظ</button>
       </div>
     </div>
   </div>
@@ -158,7 +158,7 @@
     <div class="modal-box large">
       <div class="modal-head">
         <h3>إدارة الأشخاص</h3>
-        <button class="close-btn" data-close="manageModal">×</button>
+        <button class="close-btn" data-close="manageModal" type="button">×</button>
       </div>
 
       <div class="manage-grid">
@@ -170,7 +170,7 @@
               <option value="main">أساسي</option>
               <option value="coordination">تنسيقات</option>
             </select>
-            <button id="addPhotographerBtn">إضافة</button>
+            <button id="addPhotographerBtn" type="button">إضافة</button>
           </div>
           <div id="photographersList" class="list"></div>
         </div>
@@ -183,7 +183,7 @@
               <option value="الدمام">الدمام</option>
               <option value="الرياض">الرياض</option>
             </select>
-            <button id="addEngineerBtn">إضافة</button>
+            <button id="addEngineerBtn" type="button">إضافة</button>
           </div>
           <div id="engineersList" class="list"></div>
         </div>
@@ -191,6 +191,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script defer src="script.js"></script>
 </body>
 </html>
