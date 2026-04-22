@@ -1,6 +1,4 @@
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -24,15 +22,8 @@ body {
   flex-wrap: wrap;
 }
 
-.topbar h1 {
-  margin: 0 0 8px;
-  font-size: 36px;
-}
-
-.topbar p {
-  margin: 0;
-  color: #475569;
-}
+.topbar h1 { margin: 0 0 8px; font-size: 36px; }
+.topbar p { margin: 0; color: #475569; }
 
 .topbar-actions {
   display: flex;
@@ -40,12 +31,7 @@ body {
   flex-wrap: wrap;
 }
 
-button,
-select,
-input,
-textarea {
-  font: inherit;
-}
+button, select, input, textarea { font: inherit; }
 
 button {
   border: none;
@@ -61,9 +47,7 @@ button.secondary {
   color: #0f172a;
 }
 
-button.active {
-  background: #0ea5e9;
-}
+button.active { background: #0ea5e9; }
 
 .card {
   background: #fff;
@@ -102,9 +86,7 @@ button.active {
   flex-wrap: wrap;
 }
 
-.table-wrap {
-  overflow-x: auto;
-}
+.table-wrap { overflow-x: auto; }
 
 table {
   width: 100%;
@@ -117,17 +99,14 @@ thead {
   color: #fff;
 }
 
-th,
-td {
+th, td {
   padding: 14px;
   text-align: right;
   border-bottom: 1px solid #e2e8f0;
   vertical-align: top;
 }
 
-tbody tr:nth-child(even) {
-  background: #f8fafc;
-}
+tbody tr:nth-child(even) { background: #f8fafc; }
 
 .badge {
   display: inline-block;
@@ -161,9 +140,7 @@ tbody tr:nth-child(even) {
   border-color: #fecdd3;
 }
 
-.hidden {
-  display: none !important;
-}
+.hidden { display: none !important; }
 
 .calendar-nav {
   display: flex;
@@ -234,9 +211,7 @@ tbody tr:nth-child(even) {
   padding: 20px;
 }
 
-.modal-box.large {
-  width: min(1100px, 100%);
-}
+.modal-box.large { width: min(1100px, 100%); }
 
 .modal-head {
   display: flex;
@@ -261,9 +236,7 @@ tbody tr:nth-child(even) {
   gap: 14px;
 }
 
-.form-grid .full {
-  grid-column: 1 / -1;
-}
+.form-grid .full { grid-column: 1 / -1; }
 
 .subcard {
   border: 1px solid #e2e8f0;
@@ -272,9 +245,7 @@ tbody tr:nth-child(even) {
   margin-bottom: 16px;
 }
 
-.subcard h4 {
-  margin-top: 0;
-}
+.subcard h4 { margin-top: 0; }
 
 .modal-actions {
   display: flex;
@@ -310,9 +281,7 @@ tbody tr:nth-child(even) {
   padding: 12px;
 }
 
-.list-item small {
-  color: #64748b;
-}
+.list-item small { color: #64748b; }
 
 .danger {
   background: #fff1f2;
@@ -328,9 +297,7 @@ tbody tr:nth-child(even) {
     grid-template-columns: 1fr;
   }
 
-  .topbar h1 {
-    font-size: 28px;
-  }
+  .topbar h1 { font-size: 28px; }
 
   .calendar-weekdays,
   .calendar-grid {
