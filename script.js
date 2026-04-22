@@ -1,508 +1,536 @@
-const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-const weekDayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-const statusOptions = ["مجدول", "قيد التنفيذ", "مكتمل", "مؤجل"];
-const STORAGE_KEY = "filming_schedule_github_mvp";
+document.addEventListener("DOMContentLoaded", () => {
+  const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  const weekDayNames = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  const STORAGE_KEY = "filming_schedule_github_mvp";
 
-let photographers = [
-  { id: "p1", name: "عمرو", role: "main" },
-  { id: "p2", name: "أبرار", role: "main" },
-  { id: "p3", name: "ابتهاج", role: "main" },
-  { id: "p4", name: "أم جني", role: "coordination" }
-];
+  let photographers = [
+    { id: "p1", name: "عمرو", role: "main" },
+    { id: "p2", name: "أبرار", role: "main" },
+    { id: "p3", name: "ابتهاج", role: "main" },
+    { id: "p4", name: "أم جني", role: "coordination" }
+  ];
 
-let engineers = [
-  { id: "e1", name: "دعاء حمزة", branch: "الدمام" },
-  { id: "e2", name: "بتول رضوان", branch: "الدمام" },
-  { id: "e3", name: "بتول بركات", branch: "الدمام" },
-  { id: "e4", name: "وسام", branch: "الدمام" },
-  { id: "e5", name: "جني", branch: "الدمام" },
-  { id: "e6", name: "هديل", branch: "الدمام" },
-  { id: "e7", name: "فرح", branch: "الدمام" },
-  { id: "e8", name: "أحمد رضا", branch: "الدمام" },
-  { id: "e9", name: "رياض", branch: "الدمام" },
-  { id: "e10", name: "حمدي", branch: "الدمام" },
-  { id: "e11", name: "حامد", branch: "الدمام" },
-  { id: "e12", name: "سعاد صوت", branch: "الدمام" },
-  { id: "e13", name: "محمد إسماعيل", branch: "الرياض" },
-  { id: "e14", name: "العنود صوت", branch: "الرياض" }
-];
+  let engineers = [
+    { id: "e1", name: "دعاء حمزة", branch: "الدمام" },
+    { id: "e2", name: "بتول رضوان", branch: "الدمام" },
+    { id: "e3", name: "بتول بركات", branch: "الدمام" },
+    { id: "e4", name: "وسام", branch: "الدمام" },
+    { id: "e5", name: "جني", branch: "الدمام" },
+    { id: "e6", name: "هديل", branch: "الدمام" },
+    { id: "e7", name: "فرح", branch: "الدمام" },
+    { id: "e8", name: "أحمد رضا", branch: "الدمام" },
+    { id: "e9", name: "رياض", branch: "الدمام" },
+    { id: "e10", name: "حمدي", branch: "الدمام" },
+    { id: "e11", name: "حامد", branch: "الدمام" },
+    { id: "e12", name: "سعاد صوت", branch: "الدمام" },
+    { id: "e13", name: "محمد إسماعيل", branch: "الرياض" },
+    { id: "e14", name: "العنود صوت", branch: "الرياض" }
+  ];
 
-let tasks = [
-  {
-    id: "w1",
-    week: 1,
-    date: "2026-04-27",
-    main: { photographerId: "p1", engineerId: "e1", status: "مجدول", script: "" },
-    coordination: { photographerId: "p4", engineerId: "e2", status: "مجدول", script: "" }
-  },
-  {
-    id: "w2",
-    week: 2,
-    date: "2026-05-04",
-    main: { photographerId: "p2", engineerId: "e3", status: "مجدول", script: "" },
-    coordination: { photographerId: "p4", engineerId: "e4", status: "مجدول", script: "" }
-  },
-  {
-    id: "w3",
-    week: 3,
-    date: "2026-05-11",
-    main: { photographerId: "p3", engineerId: "e13", status: "مجدول", script: "" },
-    coordination: { photographerId: "p4", engineerId: "e5", status: "مجدول", script: "" }
-  },
-  {
-    id: "w4",
-    week: 4,
-    date: "2026-05-18",
-    main: { photographerId: "p1", engineerId: "e6", status: "مجدول", script: "" },
-    coordination: { photographerId: "p4", engineerId: "e7", status: "مجدول", script: "" }
-  }
-];
-
-let currentView = "table";
-let currentMonth = new Date("2026-05-01T12:00:00");
-let editingTaskId = null;
-
-function saveLocal() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({ photographers, engineers, tasks })
-  );
-}
-
-function loadLocal() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return;
-  try {
-    const parsed = JSON.parse(saved);
-    if (parsed.photographers) photographers = parsed.photographers;
-    if (parsed.engineers) engineers = parsed.engineers;
-    if (parsed.tasks) tasks = parsed.tasks;
-  } catch (e) {
-    console.error("Failed to load local data", e);
-  }
-}
-
-function getPhotographerById(id) {
-  return photographers.find((p) => p.id === id);
-}
-
-function getEngineerById(id) {
-  return engineers.find((e) => e.id === id);
-}
-
-function getPhotographerName(id) {
-  return getPhotographerById(id)?.name || "-";
-}
-
-function getEngineerName(id) {
-  return getEngineerById(id)?.name || "-";
-}
-
-function getEngineerBranch(id) {
-  return getEngineerById(id)?.branch || "-";
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "-";
-  const d = new Date(`${dateStr}T12:00:00`);
-  return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-function getBadgeClass(name) {
-  if (name === "عمرو") return "badge badge-teal";
-  if (name === "أبرار") return "badge badge-blue";
-  if (name === "ابتهاج") return "badge badge-violet";
-  return "badge badge-rose";
-}
-
-function getFilters() {
-  return {
-    search: document.getElementById("searchInput").value.trim().toLowerCase(),
-    status: document.getElementById("statusFilter").value,
-    branch: document.getElementById("branchFilter").value
-  };
-}
-
-function getFilteredTasks() {
-  const filters = getFilters();
-
-  return tasks
-    .map((task) => ({
-      ...task,
-      mainPhotographerName: getPhotographerName(task.main.photographerId),
-      coordPhotographerName: getPhotographerName(task.coordination.photographerId),
-      mainEngineerName: getEngineerName(task.main.engineerId),
-      coordEngineerName: getEngineerName(task.coordination.engineerId),
-      mainBranch: getEngineerBranch(task.main.engineerId),
-      coordBranch: getEngineerBranch(task.coordination.engineerId)
-    }))
-    .filter((task) => {
-      const text = [
-        task.week,
-        task.mainPhotographerName,
-        task.coordPhotographerName,
-        task.mainEngineerName,
-        task.coordEngineerName,
-        task.main.script,
-        task.coordination.script
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      const matchesSearch = text.includes(filters.search);
-      const matchesStatus =
-        filters.status === "الكل" ||
-        task.main.status === filters.status ||
-        task.coordination.status === filters.status;
-      const matchesBranch =
-        filters.branch === "الكل" ||
-        task.mainBranch === filters.branch ||
-        task.coordBranch === filters.branch;
-
-      return matchesSearch && matchesStatus && matchesBranch;
-    })
-    .sort((a, b) => a.week - b.week);
-}
-
-function renderTable() {
-  const tbody = document.getElementById("tasksTableBody");
-  const filtered = getFilteredTasks();
-
-  tbody.innerHTML = "";
-
-  filtered.forEach((task) => {
-    const tr1 = document.createElement("tr");
-    tr1.innerHTML = `
-      <td rowspan="2">${task.week}</td>
-      <td rowspan="2">${formatDate(task.date)}</td>
-      <td>الحلقة الأساسية</td>
-      <td><span class="${getBadgeClass(task.mainPhotographerName)}">${task.mainPhotographerName}</span></td>
-      <td>${task.mainEngineerName}</td>
-      <td>${task.mainBranch}</td>
-      <td>${task.main.status}</td>
-      <td>${task.main.script || "—"}</td>
-      <td rowspan="2"><button onclick="openTaskModal('${task.id}')"><i data-feather></i>تعديل</button></td>
-    `;
-
-    const tr2 = document.createElement("tr");
-    tr2.innerHTML = `
-      <td>التنسيقات</td>
-      <td><span class="${getBadgeClass(task.coordPhotographerName)}">${task.coordPhotographerName}</span></td>
-      <td>${task.coordEngineerName}</td>
-      <td>${task.coordBranch}</td>
-      <td>${task.coordination.status}</td>
-      <td>${task.coordination.script || "—"}</td>
-    `;
-
-    tbody.appendChild(tr1);
-    tbody.appendChild(tr2);
-  });
-}
-
-function buildCalendarDays(date) {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const startIndex = firstDay.getDay();
-  const totalDays = lastDay.getDate();
-  const days = [];
-
-  for (let i = 0; i < startIndex; i++) days.push(null);
-  for (let day = 1; day <= totalDays; day++) {
-    days.push(new Date(year, month, day));
-  }
-  while (days.length % 7 !== 0) days.push(null);
-
-  return days;
-}
-
-function renderCalendar() {
-  document.getElementById("monthLabel").textContent =
-    `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
-
-  const weekdays = document.getElementById("calendarWeekdays");
-  weekdays.innerHTML = "";
-  weekDayNames.forEach((day) => {
-    const div = document.createElement("div");
-    div.textContent = day;
-    weekdays.appendChild(div);
-  });
-
-  const grid = document.getElementById("calendarGrid");
-  grid.innerHTML = "";
-
-  const filtered = getFilteredTasks();
-  const map = {};
-  filtered.forEach((task) => {
-    if (!map[task.date]) map[task.date] = [];
-    map[task.date].push(task);
-  });
-
-  buildCalendarDays(currentMonth).forEach((dateObj) => {
-    if (!dateObj) {
-      const empty = document.createElement("div");
-      empty.className = "calendar-empty";
-      grid.appendChild(empty);
-      return;
+  let tasks = [
+    {
+      id: "w1",
+      week: 1,
+      date: "2026-04-27",
+      main: { photographerId: "p1", engineerId: "e1", status: "مجدول", script: "" },
+      coordination: { photographerId: "p4", engineerId: "e2", status: "مجدول", script: "" }
+    },
+    {
+      id: "w2",
+      week: 2,
+      date: "2026-05-04",
+      main: { photographerId: "p2", engineerId: "e3", status: "مجدول", script: "" },
+      coordination: { photographerId: "p4", engineerId: "e4", status: "مجدول", script: "" }
+    },
+    {
+      id: "w3",
+      week: 3,
+      date: "2026-05-11",
+      main: { photographerId: "p3", engineerId: "e13", status: "مجدول", script: "" },
+      coordination: { photographerId: "p4", engineerId: "e5", status: "مجدول", script: "" }
+    },
+    {
+      id: "w4",
+      week: 4,
+      date: "2026-05-18",
+      main: { photographerId: "p1", engineerId: "e6", status: "مجدول", script: "" },
+      coordination: { photographerId: "p4", engineerId: "e7", status: "مجدول", script: "" }
     }
+  ];
 
-    const key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
-    const cell = document.createElement("div");
-    cell.className = "calendar-day";
+  let currentMonth = new Date("2026-05-01T12:00:00");
+  let editingTaskId = null;
 
-    const num = document.createElement("div");
-    num.className = "day-number";
-    num.textContent = dateObj.getDate();
-    cell.appendChild(num);
+  const el = {
+    tableViewBtn: document.getElementById("tableViewBtn"),
+    calendarViewBtn: document.getElementById("calendarViewBtn"),
+    manageBtn: document.getElementById("manageBtn"),
+    addTaskBtn: document.getElementById("addTaskBtn"),
+    tableView: document.getElementById("tableView"),
+    calendarView: document.getElementById("calendarView"),
+    tasksTableBody: document.getElementById("tasksTableBody"),
+    monthLabel: document.getElementById("monthLabel"),
+    calendarWeekdays: document.getElementById("calendarWeekdays"),
+    calendarGrid: document.getElementById("calendarGrid"),
+    prevMonthBtn: document.getElementById("prevMonthBtn"),
+    nextMonthBtn: document.getElementById("nextMonthBtn"),
+    searchInput: document.getElementById("searchInput"),
+    statusFilter: document.getElementById("statusFilter"),
+    branchFilter: document.getElementById("branchFilter"),
+    taskModal: document.getElementById("taskModal"),
+    taskModalTitle: document.getElementById("taskModalTitle"),
+    taskWeek: document.getElementById("taskWeek"),
+    taskDate: document.getElementById("taskDate"),
+    mainPhotographer: document.getElementById("mainPhotographer"),
+    mainEngineer: document.getElementById("mainEngineer"),
+    mainStatus: document.getElementById("mainStatus"),
+    mainScript: document.getElementById("mainScript"),
+    coordPhotographer: document.getElementById("coordPhotographer"),
+    coordEngineer: document.getElementById("coordEngineer"),
+    coordStatus: document.getElementById("coordStatus"),
+    coordScript: document.getElementById("coordScript"),
+    saveTaskBtn: document.getElementById("saveTaskBtn"),
+    manageModal: document.getElementById("manageModal"),
+    newPhotographerName: document.getElementById("newPhotographerName"),
+    newPhotographerRole: document.getElementById("newPhotographerRole"),
+    addPhotographerBtn: document.getElementById("addPhotographerBtn"),
+    photographersList: document.getElementById("photographersList"),
+    newEngineerName: document.getElementById("newEngineerName"),
+    newEngineerBranch: document.getElementById("newEngineerBranch"),
+    addEngineerBtn: document.getElementById("addEngineerBtn"),
+    engineersList: document.getElementById("engineersList")
+  };
 
-    (map[key] || []).forEach((task) => {
-      const event = document.createElement("div");
-      event.className = "day-event";
-      event.innerHTML = `
-        <div><strong>أسبوع ${task.week}</strong></div>
-        <div>${task.mainPhotographerName} × ${task.mainEngineerName}</div>
-        <div>${task.coordPhotographerName} × ${task.coordEngineerName}</div>
+  function saveLocal() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ photographers, engineers, tasks }));
+  }
+
+  function loadLocal() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed.photographers)) photographers = parsed.photographers;
+      if (Array.isArray(parsed.engineers)) engineers = parsed.engineers;
+      if (Array.isArray(parsed.tasks)) tasks = parsed.tasks;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function getPhotographerById(id) {
+    return photographers.find((p) => p.id === id);
+  }
+
+  function getEngineerById(id) {
+    return engineers.find((e) => e.id === id);
+  }
+
+  function getPhotographerName(id) {
+    return getPhotographerById(id)?.name || "-";
+  }
+
+  function getEngineerName(id) {
+    return getEngineerById(id)?.name || "-";
+  }
+
+  function getEngineerBranch(id) {
+    return getEngineerById(id)?.branch || "-";
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return "-";
+    const d = new Date(`${dateStr}T12:00:00`);
+    return `${d.getDate()} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  function getBadgeClass(name) {
+    if (name === "عمرو") return "badge badge-teal";
+    if (name === "أبرار") return "badge badge-blue";
+    if (name === "ابتهاج") return "badge badge-violet";
+    return "badge badge-rose";
+  }
+
+  function getFilters() {
+    return {
+      search: el.searchInput.value.trim().toLowerCase(),
+      status: el.statusFilter.value,
+      branch: el.branchFilter.value
+    };
+  }
+
+  function getFilteredTasks() {
+    const filters = getFilters();
+
+    return tasks
+      .map((task) => ({
+        ...task,
+        mainPhotographerName: getPhotographerName(task.main.photographerId),
+        coordPhotographerName: getPhotographerName(task.coordination.photographerId),
+        mainEngineerName: getEngineerName(task.main.engineerId),
+        coordEngineerName: getEngineerName(task.coordination.engineerId),
+        mainBranch: getEngineerBranch(task.main.engineerId),
+        coordBranch: getEngineerBranch(task.coordination.engineerId)
+      }))
+      .filter((task) => {
+        const text = [
+          task.week,
+          task.mainPhotographerName,
+          task.coordPhotographerName,
+          task.mainEngineerName,
+          task.coordEngineerName,
+          task.main.script,
+          task.coordination.script
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = text.includes(filters.search);
+        const matchesStatus =
+          filters.status === "الكل" ||
+          task.main.status === filters.status ||
+          task.coordination.status === filters.status;
+        const matchesBranch =
+          filters.branch === "الكل" ||
+          task.mainBranch === filters.branch ||
+          task.coordBranch === filters.branch;
+
+        return matchesSearch && matchesStatus && matchesBranch;
+      })
+      .sort((a, b) => a.week - b.week);
+  }
+
+  function renderTable() {
+    const filtered = getFilteredTasks();
+    el.tasksTableBody.innerHTML = "";
+
+    filtered.forEach((task) => {
+      const tr1 = document.createElement("tr");
+      tr1.innerHTML = `
+        <td rowspan="2">${task.week}</td>
+        <td rowspan="2">${formatDate(task.date)}</td>
+        <td>الحلقة الأساسية</td>
+        <td><span class="${getBadgeClass(task.mainPhotographerName)}">${task.mainPhotographerName}</span></td>
+        <td>${task.mainEngineerName}</td>
+        <td>${task.mainBranch}</td>
+        <td>${task.main.status}</td>
+        <td>${task.main.script || "—"}</td>
+        <td rowspan="2"><button type="button" class="edit-task-btn" data-id="${task.id}">تعديل</button></td>
       `;
-      event.onclick = () => openTaskModal(task.id);
-      cell.appendChild(event);
+
+      const tr2 = document.createElement("tr");
+      tr2.innerHTML = `
+        <td>التنسيقات</td>
+        <td><span class="${getBadgeClass(task.coordPhotographerName)}">${task.coordPhotographerName}</span></td>
+        <td>${task.coordEngineerName}</td>
+        <td>${task.coordBranch}</td>
+        <td>${task.coordination.status}</td>
+        <td>${task.coordination.script || "—"}</td>
+      `;
+
+      el.tasksTableBody.appendChild(tr1);
+      el.tasksTableBody.appendChild(tr2);
     });
 
-    grid.appendChild(cell);
-  });
-}
-
-function populateSelect(selectId, items, valueKey = "id", labelFn = (x) => x.name) {
-  const select = document.getElementById(selectId);
-  select.innerHTML = "";
-  items.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item[valueKey];
-    option.textContent = labelFn(item);
-    select.appendChild(option);
-  });
-}
-
-function openTaskModal(taskId = null) {
-  editingTaskId = taskId;
-
-  const mainPhotographers = photographers.filter((p) => p.role === "main");
-  const coordPhotographers = photographers.filter((p) => p.role === "coordination");
-
-  populateSelect("mainPhotographer", mainPhotographers);
-  populateSelect("coordPhotographer", coordPhotographers);
-  populateSelect("mainEngineer", engineers, "id", (x) => `${x.name} - ${x.branch}`);
-  populateSelect("coordEngineer", engineers, "id", (x) => `${x.name} - ${x.branch}`);
-
-  if (taskId) {
-    const task = tasks.find((t) => t.id === taskId);
-    document.getElementById("taskModalTitle").textContent = `تعديل الأسبوع ${task.week}`;
-    document.getElementById("taskWeek").value = task.week;
-    document.getElementById("taskDate").value = task.date;
-    document.getElementById("mainPhotographer").value = task.main.photographerId || "";
-    document.getElementById("mainEngineer").value = task.main.engineerId || "";
-    document.getElementById("mainStatus").value = task.main.status;
-    document.getElementById("mainScript").value = task.main.script || "";
-    document.getElementById("coordPhotographer").value = task.coordination.photographerId || "";
-    document.getElementById("coordEngineer").value = task.coordination.engineerId || "";
-    document.getElementById("coordStatus").value = task.coordination.status;
-    document.getElementById("coordScript").value = task.coordination.script || "";
-  } else {
-    document.getElementById("taskModalTitle").textContent = "إضافة مهمة";
-    const nextWeek = Math.max(0, ...tasks.map((t) => t.week)) + 1;
-    document.getElementById("taskWeek").value = nextWeek;
-    document.getElementById("taskDate").value = "";
-    document.getElementById("mainPhotographer").value = mainPhotographers[0]?.id || "";
-    document.getElementById("mainEngineer").value = engineers[0]?.id || "";
-    document.getElementById("mainStatus").value = "مجدول";
-    document.getElementById("mainScript").value = "";
-    document.getElementById("coordPhotographer").value = coordPhotographers[0]?.id || "";
-    document.getElementById("coordEngineer").value = engineers[1]?.id || engineers[0]?.id || "";
-    document.getElementById("coordStatus").value = "مجدول";
-    document.getElementById("coordScript").value = "";
+    document.querySelectorAll(".edit-task-btn").forEach((btn) => {
+      btn.addEventListener("click", () => openTaskModal(btn.dataset.id));
+    });
   }
 
-  openModal("taskModal");
-}
+  function buildCalendarDays(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startIndex = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+    const days = [];
 
-function saveTask() {
-  const payload = {
-    id: editingTaskId || `w${Date.now()}`,
-    week: Number(document.getElementById("taskWeek").value),
-    date: document.getElementById("taskDate").value,
-    main: {
-      photographerId: document.getElementById("mainPhotographer").value,
-      engineerId: document.getElementById("mainEngineer").value,
-      status: document.getElementById("mainStatus").value,
-      script: document.getElementById("mainScript").value.trim()
-    },
-    coordination: {
-      photographerId: document.getElementById("coordPhotographer").value,
-      engineerId: document.getElementById("coordEngineer").value,
-      status: document.getElementById("coordStatus").value,
-      script: document.getElementById("coordScript").value.trim()
-    }
-  };
+    for (let i = 0; i < startIndex; i++) days.push(null);
+    for (let day = 1; day <= totalDays; day++) days.push(new Date(year, month, day));
+    while (days.length % 7 !== 0) days.push(null);
 
-  if (editingTaskId) {
-    tasks = tasks.map((t) => (t.id === editingTaskId ? payload : t));
-  } else {
-    tasks.push(payload);
+    return days;
   }
 
-  saveLocal();
-  closeModal("taskModal");
-  renderAll();
-}
+  function renderCalendar() {
+    el.monthLabel.textContent = `${monthNames[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+    el.calendarWeekdays.innerHTML = "";
+    el.calendarGrid.innerHTML = "";
 
-function openModal(id) {
-  document.getElementById(id).classList.remove("hidden");
-}
+    weekDayNames.forEach((day) => {
+      const div = document.createElement("div");
+      div.textContent = day;
+      el.calendarWeekdays.appendChild(div);
+    });
 
-function closeModal(id) {
-  document.getElementById(id).classList.add("hidden");
-}
+    const filtered = getFilteredTasks();
+    const map = {};
 
-function renderPeople() {
-  const photographersList = document.getElementById("photographersList");
-  const engineersList = document.getElementById("engineersList");
+    filtered.forEach((task) => {
+      if (!map[task.date]) map[task.date] = [];
+      map[task.date].push(task);
+    });
 
-  photographersList.innerHTML = "";
-  engineersList.innerHTML = "";
+    buildCalendarDays(currentMonth).forEach((dateObj) => {
+      if (!dateObj) {
+        const empty = document.createElement("div");
+        empty.className = "calendar-empty";
+        el.calendarGrid.appendChild(empty);
+        return;
+      }
 
-  photographers.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "list-item";
-    row.innerHTML = `
-      <div>
-        <div>${item.name}</div>
-        <small>${item.role === "main" ? "أساسي" : "تنسيقات"}</small>
-      </div>
-      <button class="danger" onclick="removePhotographer('${item.id}')">حذف</button>
-    `;
-    photographersList.appendChild(row);
-  });
+      const key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}-${String(dateObj.getDate()).padStart(2, "0")}`;
+      const cell = document.createElement("div");
+      cell.className = "calendar-day";
 
-  engineers.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "list-item";
-    row.innerHTML = `
-      <div>
-        <div>${item.name}</div>
-        <small>${item.branch}</small>
-      </div>
-      <button class="danger" onclick="removeEngineer('${item.id}')">حذف</button>
-    `;
-    engineersList.appendChild(row);
-  });
-}
+      const num = document.createElement("div");
+      num.className = "day-number";
+      num.textContent = dateObj.getDate();
+      cell.appendChild(num);
 
-function addPhotographer() {
-  const name = document.getElementById("newPhotographerName").value.trim();
-  const role = document.getElementById("newPhotographerRole").value;
-  if (!name) return;
+      (map[key] || []).forEach((task) => {
+        const event = document.createElement("div");
+        event.className = "day-event";
+        event.innerHTML = `
+          <div><strong>أسبوع ${task.week}</strong></div>
+          <div>${task.mainPhotographerName} × ${task.mainEngineerName}</div>
+          <div>${task.coordPhotographerName} × ${task.coordEngineerName}</div>
+        `;
+        event.addEventListener("click", () => openTaskModal(task.id));
+        cell.appendChild(event);
+      });
 
-  photographers.push({
-    id: `p${Date.now()}`,
-    name,
-    role
-  });
+      el.calendarGrid.appendChild(cell);
+    });
+  }
 
-  document.getElementById("newPhotographerName").value = "";
-  saveLocal();
-  renderAll();
-}
+  function populateSelect(select, items, labelFn) {
+    select.innerHTML = "";
+    items.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = labelFn(item);
+      select.appendChild(option);
+    });
+  }
 
-function addEngineer() {
-  const name = document.getElementById("newEngineerName").value.trim();
-  const branch = document.getElementById("newEngineerBranch").value;
-  if (!name) return;
+  function openModal(modal) {
+    modal.classList.remove("hidden");
+  }
 
-  engineers.push({
-    id: `e${Date.now()}`,
-    name,
-    branch
-  });
+  function closeModal(modal) {
+    modal.classList.add("hidden");
+  }
 
-  document.getElementById("newEngineerName").value = "";
-  saveLocal();
-  renderAll();
-}
+  function openTaskModal(taskId = null) {
+    editingTaskId = taskId;
 
-function removePhotographer(id) {
-  photographers = photographers.filter((p) => p.id !== id);
-  tasks = tasks.map((task) => ({
-    ...task,
-    main: {
-      ...task.main,
-      photographerId: task.main.photographerId === id ? "" : task.main.photographerId
-    },
-    coordination: {
-      ...task.coordination,
-      photographerId: task.coordination.photographerId === id ? "" : task.coordination.photographerId
+    const mainPhotographers = photographers.filter((p) => p.role === "main");
+    const coordPhotographers = photographers.filter((p) => p.role === "coordination");
+
+    populateSelect(el.mainPhotographer, mainPhotographers, (x) => x.name);
+    populateSelect(el.coordPhotographer, coordPhotographers, (x) => x.name);
+    populateSelect(el.mainEngineer, engineers, (x) => `${x.name} - ${x.branch}`);
+    populateSelect(el.coordEngineer, engineers, (x) => `${x.name} - ${x.branch}`);
+
+    if (taskId) {
+      const task = tasks.find((t) => t.id === taskId);
+      if (!task) return;
+
+      el.taskModalTitle.textContent = `تعديل الأسبوع ${task.week}`;
+      el.taskWeek.value = task.week;
+      el.taskDate.value = task.date;
+      el.mainPhotographer.value = task.main.photographerId || "";
+      el.mainEngineer.value = task.main.engineerId || "";
+      el.mainStatus.value = task.main.status;
+      el.mainScript.value = task.main.script || "";
+      el.coordPhotographer.value = task.coordination.photographerId || "";
+      el.coordEngineer.value = task.coordination.engineerId || "";
+      el.coordStatus.value = task.coordination.status;
+      el.coordScript.value = task.coordination.script || "";
+    } else {
+      const nextWeek = Math.max(0, ...tasks.map((t) => t.week)) + 1;
+      el.taskModalTitle.textContent = "إضافة مهمة";
+      el.taskWeek.value = nextWeek;
+      el.taskDate.value = "";
+      el.mainPhotographer.value = mainPhotographers[0]?.id || "";
+      el.mainEngineer.value = engineers[0]?.id || "";
+      el.mainStatus.value = "مجدول";
+      el.mainScript.value = "";
+      el.coordPhotographer.value = coordPhotographers[0]?.id || "";
+      el.coordEngineer.value = engineers[1]?.id || engineers[0]?.id || "";
+      el.coordStatus.value = "مجدول";
+      el.coordScript.value = "";
     }
-  }));
 
-  saveLocal();
-  renderAll();
-}
+    openModal(el.taskModal);
+  }
 
-function removeEngineer(id) {
-  engineers = engineers.filter((e) => e.id !== id);
-  tasks = tasks.map((task) => ({
-    ...task,
-    main: {
-      ...task.main,
-      engineerId: task.main.engineerId === id ? "" : task.main.engineerId
-    },
-    coordination: {
-      ...task.coordination,
-      engineerId: task.coordination.engineerId === id ? "" : task.coordination.engineerId
+  function saveTask() {
+    const payload = {
+      id: editingTaskId || `w${Date.now()}`,
+      week: Number(el.taskWeek.value),
+      date: el.taskDate.value,
+      main: {
+        photographerId: el.mainPhotographer.value,
+        engineerId: el.mainEngineer.value,
+        status: el.mainStatus.value,
+        script: el.mainScript.value.trim()
+      },
+      coordination: {
+        photographerId: el.coordPhotographer.value,
+        engineerId: el.coordEngineer.value,
+        status: el.coordStatus.value,
+        script: el.coordScript.value.trim()
+      }
+    };
+
+    if (editingTaskId) {
+      tasks = tasks.map((t) => (t.id === editingTaskId ? payload : t));
+    } else {
+      tasks.push(payload);
     }
-  }));
 
-  saveLocal();
+    saveLocal();
+    closeModal(el.taskModal);
+    renderAll();
+  }
+
+  function renderPeople() {
+    el.photographersList.innerHTML = "";
+    el.engineersList.innerHTML = "";
+
+    photographers.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "list-item";
+      row.innerHTML = `
+        <div>
+          <div>${item.name}</div>
+          <small>${item.role === "main" ? "أساسي" : "تنسيقات"}</small>
+        </div>
+        <button type="button" class="danger remove-photographer-btn" data-id="${item.id}">حذف</button>
+      `;
+      el.photographersList.appendChild(row);
+    });
+
+    engineers.forEach((item) => {
+      const row = document.createElement("div");
+      row.className = "list-item";
+      row.innerHTML = `
+        <div>
+          <div>${item.name}</div>
+          <small>${item.branch}</small>
+        </div>
+        <button type="button" class="danger remove-engineer-btn" data-id="${item.id}">حذف</button>
+      `;
+      el.engineersList.appendChild(row);
+    });
+
+    document.querySelectorAll(".remove-photographer-btn").forEach((btn) => {
+      btn.addEventListener("click", () => removePhotographer(btn.dataset.id));
+    });
+
+    document.querySelectorAll(".remove-engineer-btn").forEach((btn) => {
+      btn.addEventListener("click", () => removeEngineer(btn.dataset.id));
+    });
+  }
+
+  function addPhotographer() {
+    const name = el.newPhotographerName.value.trim();
+    const role = el.newPhotographerRole.value;
+    if (!name) return;
+
+    photographers.push({ id: `p${Date.now()}`, name, role });
+    el.newPhotographerName.value = "";
+    saveLocal();
+    renderAll();
+  }
+
+  function addEngineer() {
+    const name = el.newEngineerName.value.trim();
+    const branch = el.newEngineerBranch.value;
+    if (!name) return;
+
+    engineers.push({ id: `e${Date.now()}`, name, branch });
+    el.newEngineerName.value = "";
+    saveLocal();
+    renderAll();
+  }
+
+  function removePhotographer(id) {
+    photographers = photographers.filter((p) => p.id !== id);
+    tasks = tasks.map((task) => ({
+      ...task,
+      main: {
+        ...task.main,
+        photographerId: task.main.photographerId === id ? "" : task.main.photographerId
+      },
+      coordination: {
+        ...task.coordination,
+        photographerId: task.coordination.photographerId === id ? "" : task.coordination.photographerId
+      }
+    }));
+    saveLocal();
+    renderAll();
+  }
+
+  function removeEngineer(id) {
+    engineers = engineers.filter((e) => e.id !== id);
+    tasks = tasks.map((task) => ({
+      ...task,
+      main: {
+        ...task.main,
+        engineerId: task.main.engineerId === id ? "" : task.main.engineerId
+      },
+      coordination: {
+        ...task.coordination,
+        engineerId: task.coordination.engineerId === id ? "" : task.coordination.engineerId
+      }
+    }));
+    saveLocal();
+    renderAll();
+  }
+
+  function switchView(view) {
+    el.tableView.classList.toggle("hidden", view !== "table");
+    el.calendarView.classList.toggle("hidden", view !== "calendar");
+    el.tableViewBtn.classList.toggle("active", view === "table");
+    el.calendarViewBtn.classList.toggle("active", view === "calendar");
+  }
+
+  function renderAll() {
+    renderTable();
+    renderCalendar();
+    renderPeople();
+  }
+
+  el.tableViewBtn.addEventListener("click", () => switchView("table"));
+  el.calendarViewBtn.addEventListener("click", () => switchView("calendar"));
+  el.manageBtn.addEventListener("click", () => openModal(el.manageModal));
+  el.addTaskBtn.addEventListener("click", () => openTaskModal());
+  el.saveTaskBtn.addEventListener("click", saveTask);
+  el.addPhotographerBtn.addEventListener("click", addPhotographer);
+  el.addEngineerBtn.addEventListener("click", addEngineer);
+  el.prevMonthBtn.addEventListener("click", () => {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  el.nextMonthBtn.addEventListener("click", () => {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+  el.searchInput.addEventListener("input", renderAll);
+  el.statusFilter.addEventListener("change", renderAll);
+  el.branchFilter.addEventListener("change", renderAll);
+
+  document.querySelectorAll("[data-close]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-close");
+      const target = document.getElementById(targetId);
+      if (target) closeModal(target);
+    });
+  });
+
+  loadLocal();
+  switchView("table");
   renderAll();
-}
-
-function switchView(view) {
-  currentView = view;
-  document.getElementById("tableView").classList.toggle("hidden", view !== "table");
-  document.getElementById("calendarView").classList.toggle("hidden", view !== "calendar");
-  document.getElementById("tableViewBtn").classList.toggle("active", view === "table");
-  document.getElementById("calendarViewBtn").classList.toggle("active", view === "calendar");
-}
-
-function renderAll() {
-  renderTable();
-  renderCalendar();
-  renderPeople();
-}
-
-document.getElementById("tableViewBtn").addEventListener("click", () => switchView("table"));
-document.getElementById("calendarViewBtn").addEventListener("click", () => switchView("calendar"));
-document.getElementById("manageBtn").addEventListener("click", () => openModal("manageModal"));
-document.getElementById("addTaskBtn").addEventListener("click", () => openTaskModal());
-document.getElementById("saveTaskBtn").addEventListener("click", saveTask);
-document.getElementById("addPhotographerBtn").addEventListener("click", addPhotographer);
-document.getElementById("addEngineerBtn").addEventListener("click", addEngineer);
-document.getElementById("prevMonthBtn").addEventListener("click", () => {
-  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
-  renderCalendar();
 });
-document.getElementById("nextMonthBtn").addEventListener("click", () => {
-  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
-  renderCalendar();
-});
-
-document.getElementById("searchInput").addEventListener("input", renderAll);
-document.getElementById("statusFilter").addEventListener("change", renderAll);
-document.getElementById("branchFilter").addEventListener("change", renderAll);
-
-document.querySelectorAll("[data-close]").forEach((btn) => {
-  btn.addEventListener("click", () => closeModal(btn.dataset.close));
-});
-
-loadLocal();
-switchView("table");
-renderAll();
